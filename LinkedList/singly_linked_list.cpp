@@ -9,6 +9,31 @@ struct LLNode
 };
 
 LLNode* list = NULL;
+void indexinsert(int pos, int val){
+    LLNode* temp = new LLNode;
+    temp ->data = val;
+    temp ->next = nullptr;
+
+    if (pos == 1){
+        temp ->next = list;
+        list = temp;
+        return;
+    }
+    LLNode* cur = list;
+
+    // move to pos -1
+    for (int i = 1; i < pos - 1; i++){
+        if (cur == nullptr){
+            cout <<"position out of range\n";
+            return;
+        }
+        cur = cur ->next;
+    }
+    temp ->next = cur ->next;
+    cur ->next = temp;
+
+}
+
 void push_front (int val){
     LLNode* newnode = new LLNode;
     newnode -> data = val;
@@ -86,7 +111,25 @@ void display(){
         cout <<endl;
     }
 }
- 
+
+void rec_display(LLNode* head) {
+    if (head == nullptr)   // base case
+        return;
+
+    cout << head->data << "  ";
+    rec_display(head->next);
+}
+
+void rec_reverse_display(LLNode* head = list) {
+
+    if (head == nullptr) {   // base case
+        return;
+    }
+
+    rec_reverse_display(head->next);   // go till end first
+    cout << head->data << "  ";        // print while coming back
+}
+
 void search (int val){
     bool found = false;
     LLNode*cur = list;
@@ -148,20 +191,68 @@ void remove(int val){
     }
 }
 
+LLNode* middle (LLNode* list){
+    LLNode* slow = list;
+    LLNode* fast = list ->next;
+    while (fast != nullptr && fast ->next != nullptr){
+        slow = slow ->next;
+        fast = fast ->next ->next;
+    }
+
+    // slow will be at middle
+    return slow;
+}
+LLNode* mergelist(LLNode* left, LLNode* right){
+    if (left == nullptr){
+        return right;
+    }
+    if (right == nullptr){
+        return left;
+    }
+    LLNode* result = nullptr;
+
+    if (left ->data <= right ->data){
+        result = left;
+        result ->next = mergelist(left->next, right);
+    }
+    else{
+        result = right;
+        result->next = mergelist(left, right->next);
+    }
+    return result;
+}
+LLNode* mergesort(LLNode* list){
+    if (list == nullptr || list ->next == nullptr){
+        return list;
+    }
+    LLNode* mid = middle(list);
+    LLNode* second = mid ->next;
+    mid ->next = nullptr;
+    
+    LLNode* left = mergesort(list);
+    LLNode* right = mergesort(second);
+
+    return mergelist(left, right);
+
+}
+
 int main() {
     int choice;
     int value;
+    int pos;
 
     while (true) {
         cout << "\n===== Singly Linked List Menu =====\n";
         cout << "1. Insert at Front\n";
         cout << "2. Insert at Back\n";
         cout << "3. sorted insert\n";
-        cout << "4. Display List\n";
-        cout << "5. Search Value\n";
-        cout << "6. Delete Value\n";
-        cout << "7. Exit\n";
-
+        cout << "4. index specific insert\n";
+        cout << "5. Display List\n";
+        cout << "6. Display reverse List\n";
+        cout << "7. Search Value\n";
+        cout << "8. Delete Value\n";
+        cout << "9. merge sort\n";
+        cout << "10. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -182,23 +273,37 @@ int main() {
                 sorted_insert(value);
                 break;
             case 4:
-                display();
+                cout << "Enter value to insert: ";
+                cin >> value;
+                cout << "Enter position: ";
+                cin >> pos;
+                indexinsert(pos, value);
                 break;
             case 5:
+                rec_display(list);
+                break;
+            case 6:
+                rec_reverse_display();
+                break;
+            case 7:
                 cout << "Enter value to search: ";
                 cin >> value;
                 search(value);
                 break;
-            case 6:
+            case 8:
                 cout << "Enter value to delete: ";
                 cin >> value;
                 remove(value);
                 break;
-            case 7:
+            case 9:
+                list = mergesort(list);
+                rec_display(list);
+                break;
+            case 10:
                 cout << "Exiting program.\n";
                 return 0;
             default:
-                cout << "Invalid choice! Please enter 1-7.\n";
+                cout << "Invalid choice! Please enter 1-9.\n";
         }
     }
 }

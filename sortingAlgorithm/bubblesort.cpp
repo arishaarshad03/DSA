@@ -22,7 +22,6 @@ int main (){
                 array[j] = array[j+1];
                 array[j+1]= temp;
                 swap = true;
-
             }
         }
         if (!swap){
